@@ -2,8 +2,17 @@
 
 #include <stdbool.h>
 
-typedef struct
-{
+// Enumeration for neuron types: regular LIF and adaptive LIF
+typedef enum NeuronType {
+    RLIF, ALIF
+} NeuronType;
+
+// Struct that defines a layer of neurons
+// "Neuron" before and after {} to define both tag and typedef alias (as is most
+// common)
+typedef struct Neuron {
+    // Neuron type
+    NeuronType type;
     // Cell voltage
     float *v;
     // Cell threshold
@@ -23,25 +32,28 @@ typedef struct
     // Constants for resetting voltage and threshold
     float v_rest;
     float th_rest;
-    // Neuron layer shape
-    int shape;
-    // Neuron type
-    char type;
+    // Neuron layer size
+    int size;
 } Neuron;
+
+// Build neuron
+Neuron build_neuron(int const size);
+
+// Init/reset neuron (voltage, spikes, threshold, trace)
+void reset_neuron(Neuron *n);
+
+// Load parameters for neuron from text
+// a_v, a_th, a_t, d_v, d_th, d_t, v_rest, th_rest, type
+void load_neuron(Neuron *n, char const *path);
+
+// Free allocated memory for neuron
+void free_neuron(Neuron *n);
 
 // Check spikes
 bool *spiking(Neuron *n);
 
 // Do refraction
 void refrac(Neuron *n, bool const *s);
-
-// Init/reset neuron (voltage, spikes, threshold, refrac, trace)
-void init_neuron(Neuron *neuron);
-Neuron *build_neuron(int const shape);
-
-// Load parameters for neuron from text
-// a_v, a_th, a_t, d_v, d_th, d_t, v_rest, th_rest, type
-void load_neuron(Neuron *n, char const *path);
 
 // Forward
 bool *forward_neuron(Neuron *n, float const *x);

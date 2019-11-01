@@ -16,12 +16,14 @@ typedef struct
     // Output neurons
     Neuron *out;
     // Input and output shape
-    int in_shape;
-    int out_shape;
+    int *in_shape;
+    int *out_shape;
 } Network;
 
 // Build network
-Network *build_network(int const in_shape, int const out_shape, Neuron const *hid, Neuron const *out, Connection const *inhid, Connection const *hidout);
+Network *build_network(int const *in_shape, int const *out_shape, Neuron const *hid,
+                       Neuron const *out, Connection const *inhid,
+                       Connection const *hidout);
 
 // Init/reset state: call inits/resets for children
 void init_network(Network *net);

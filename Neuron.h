@@ -11,6 +11,8 @@ typedef enum NeuronType { RLIF, ALIF } NeuronType;
 typedef struct Neuron {
   // Neuron type
   NeuronType type;
+  // Neuron layer size
+  int size;
   // Inputs
   float *x;
   // Cell voltage
@@ -22,18 +24,11 @@ typedef struct Neuron {
   // Post-synaptic firing trace
   float *t;
   // Constants for addition of voltage, threshold and trace
-  float a_v;
-  float a_th;
-  float a_t;
+  float a_v, a_th, a_t;
   // Constants for decay of voltage, threshold and trace
-  float d_v;
-  float d_th;
-  float d_t;
+  float d_v, d_th, d_t;
   // Constants for resetting voltage and threshold
-  float v_rest;
-  float th_rest;
-  // Neuron layer size
-  int size;
+  float v_rest, th_rest;
 } Neuron;
 
 // Build neuron
@@ -49,21 +44,5 @@ void load_neuron(Neuron *n, char const path[]);
 // Free allocated memory for neuron
 void free_neuron(Neuron *n);
 
-// Check spikes
-void spiking(Neuron *n);
-
-// Do refraction
-void refrac(Neuron *n);
-
-// Update trace
-void update_trace(Neuron *n);
-
-// Update voltage
-void update_voltage(Neuron *n);
-
-// Update threshold
-void update_threshold(Neuron *n);
-
 // Forward
-void forward_neuron(Neuron *n, int const post, int const pre,
-                    float const x[post][pre]);
+void forward_neuron(Neuron *n);

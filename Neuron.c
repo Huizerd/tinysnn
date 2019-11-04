@@ -61,6 +61,7 @@ void reset_neuron(Neuron *n) {
 void load_neuron(Neuron *n, char const path[]) {
   // File containing neuron parameters
   // const here gives warning
+  // TODO: add some checking?
   FILE *file = fopen(path, "r");
   // Consists of only single line:
   // a_v, a_th, a_t, d_v, d_th, d_t, v_rest, th_rest, type
@@ -81,7 +82,7 @@ void free_neuron(Neuron *n) {
 }
 
 // Check spikes
-void spiking(Neuron *n) {
+static void spiking(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // If above/equal to threshold: set spike, else don't
@@ -90,7 +91,7 @@ void spiking(Neuron *n) {
 }
 
 // Do refraction
-void refrac(Neuron *n) {
+static void refrac(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // If spike, then refraction
@@ -101,8 +102,8 @@ void refrac(Neuron *n) {
 
 // Update trace
 // TODO: maybe all these separate loops over neurons are a bad idea, and we
-// should do one forward loop?
-void update_trace(Neuron *n) {
+//  should do one forward loop?
+static void update_trace(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // First decay trace, then increase for outgoing spikes
@@ -112,7 +113,7 @@ void update_trace(Neuron *n) {
 }
 
 // Update voltage
-void update_voltage(Neuron *n) {
+static void update_voltage(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // Decay difference with resting potential, then increase for incoming
@@ -123,7 +124,7 @@ void update_voltage(Neuron *n) {
 }
 
 // Update threshold
-void update_threshold(Neuron *n) {
+static void update_threshold(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // First decay threshold, then increase for outgoing spikes
@@ -134,13 +135,12 @@ void update_threshold(Neuron *n) {
 
 // Forward: encompasses voltage/trace/threshold updates, spiking and refraction
 // TODO: use above functions or write new loop which does all in one (and use
-// above for inspiration)
-void forward_neuron(Neuron *n, int const post, int const pre,
-                    float const x[post][pre]) {
-  // Fold inputs (sum last dimension)
-  sum_2d(post, pre, x, n->x);
+//  above for inspiration)
+void forward_neuron(Neuron *n) {
+  // TODO: check dimension, but not here (called too often) -> do in network
+  //  init
   // Update voltage
-  // TODO: pass n because this is already a pointer
+  // Pass n because this is already a pointer
   update_voltage(n);
   // Get spikes
   spiking(n);
@@ -148,6 +148,7 @@ void forward_neuron(Neuron *n, int const post, int const pre,
   update_trace(n);
   // Refraction
   refrac(n);
+  // TODO: update_threshold() for adaptive LIF
   // No return, spikes are a member of Neuron struct and can be used for next
   // layer
 }

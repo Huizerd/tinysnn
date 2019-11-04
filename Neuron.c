@@ -1,4 +1,5 @@
 #include "Neuron.h"
+#include "functional.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,8 +16,9 @@ Neuron build_neuron(int const size) {
     // Set size
     n.size = size;
 
-    // Allocate memory for arrays: voltage, threshold, spikes, trace
+    // Allocate memory for arrays: inputs, voltage, threshold, spikes, trace
     // No need for type casting
+    n.x = calloc(n.size, sizeof(*n.x));
     n.v = calloc(n.size, sizeof(*n.v));
     n.th = calloc(n.size, sizeof(*n.th));
     n.s = calloc(n.size, sizeof(*n.s));
@@ -38,10 +40,12 @@ Neuron build_neuron(int const size) {
     return n;
 }
 
-// Init/reset neuron (voltage, spikes, threshold, trace)
+// Init/reset neuron (inputs, voltage, spikes, threshold, trace)
 void reset_neuron(Neuron *n) {
     // Loop over neurons
     for (int i = 0; i < n->size; i++) {
+        // Inputs
+        n->x[i] = 0.0f;
         // Voltage
         n->v[i] = n->v_rest;
         // Spikes
@@ -54,7 +58,7 @@ void reset_neuron(Neuron *n) {
 }
 
 // Load parameters for neuron from text
-void load_neuron(Neuron *n, char const *path) {
+void load_neuron(Neuron *n, char const path[]) {
     // File containing neuron parameters
     // const here gives warning
     FILE *file = fopen(path, "r");
@@ -68,9 +72,78 @@ void load_neuron(Neuron *n, char const *path) {
 
 // Free allocated memory for neuron
 void free_neuron(Neuron *n) {
-    // calloc() was used for voltage, threshold, spike and trace arrays
+    // calloc() was used for inputs, voltage, threshold, spike and trace arrays
+    free(n->x);
     free(n->v);
     free(n->th);
     free(n->s);
     free(n->t);
+}
+
+// Check spikes
+void spiking(Neuron *n) {
+    // Loop over neurons
+    for (int i = 0; i < n->size; i++) {
+        // If above/equal to threshold: set spike, else don't
+        n->s[i] = n->v[i] >= n->th[i] ? true : false;
+    }
+}
+
+// Do refraction
+void refrac(Neuron *n) {
+    // Loop over neurons
+    for (int i = 0; i < n->size; i++) {
+        // If spike, then refraction
+        // We don't have a refractory period, so no need to take care of that
+        n->v[i] = n->s[i] == true ? n->v_rest : n->v[i];
+    }
+}
+
+// Update trace
+// TODO: maybe all these separate loops over neurons are a bad idea, and we should do one forward loop?
+void update_trace(Neuron *n) {
+    // Loop over neurons
+    for (int i = 0; i < n->size; i++) {
+        // First decay trace, then increase for outgoing spikes
+        n->t[i] *= n->d_t;
+        n->t[i] += n->a_t * (float) n->s[i];
+    }
+}
+
+// Update voltage
+void update_voltage(Neuron *n) {
+    // Loop over neurons
+    for (int i = 0; i < n->size; i++) {
+        // Decay difference with resting potential, then increase for incoming spikes
+        n->v[i] = (n->v[i] - n->v_rest) * n->d_v;
+        n->v[i] += n->a_v * n->x[i];
+    }
+}
+
+// Update threshold
+void update_threshold(Neuron *n) {
+    // Loop over neurons
+    for (int i = 0; i < n->size; i++) {
+        // First decay threshold, then increase for outgoing spikes
+        n->th[i] *= n->d_th;
+        n->th[i] += n->a_th * (float) n->s[i];
+    }
+}
+
+// Forward: encompasses voltage/trace/threshold updates, spiking and refraction
+// TODO: use above functions or write new loop which does all in one (and use above for inspiration)
+void
+forward_neuron(Neuron *n, int const post, int const pre, float const x[post][pre]) {
+    // Fold inputs (sum last dimension)
+    sum_2d(post, pre, x, n->x);
+    // Update voltage
+    // TODO: pass n because this is already a pointer
+    update_voltage(n);
+    // Get spikes
+    spiking(n);
+    // Update trace
+    update_trace(n);
+    // Refraction
+    refrac(n);
+    // No return, spikes are a member of Neuron struct and can be used for next layer
 }

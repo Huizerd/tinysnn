@@ -2,19 +2,18 @@
 
 #include <stdbool.h>
 
-typedef struct
-{
-    // Connection weights
-    float *w;
-    // Connection shape
-    int *shape;
+typedef struct {
+  // Connection weights
+  float *w;
+  // Connection shape
+  int *shape;
 } Connection;
 
 // Build connection
 Connection *build_connection(int const *shape)
 
-// Init/reset connection
-void init_connection(Connection *c);
+    // Init/reset connection
+    void init_connection(Connection *c);
 
 // Load parameters for connection from text
 // Only w

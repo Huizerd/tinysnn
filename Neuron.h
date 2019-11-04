@@ -3,39 +3,37 @@
 #include <stdbool.h>
 
 // Enumeration for neuron types: regular LIF and adaptive LIF
-typedef enum NeuronType {
-    RLIF, ALIF
-} NeuronType;
+typedef enum NeuronType { RLIF, ALIF } NeuronType;
 
 // Struct that defines a layer of neurons
 // "Neuron" before and after {} to define both tag and typedef alias (as is most
 // common)
 typedef struct Neuron {
-    // Neuron type
-    NeuronType type;
-    // Inputs
-    float *x;
-    // Cell voltage
-    float *v;
-    // Cell threshold
-    float *th;
-    // Cell spikes
-    bool *s;
-    // Post-synaptic firing trace
-    float *t;
-    // Constants for addition of voltage, threshold and trace
-    float a_v;
-    float a_th;
-    float a_t;
-    // Constants for decay of voltage, threshold and trace
-    float d_v;
-    float d_th;
-    float d_t;
-    // Constants for resetting voltage and threshold
-    float v_rest;
-    float th_rest;
-    // Neuron layer size
-    int size;
+  // Neuron type
+  NeuronType type;
+  // Inputs
+  float *x;
+  // Cell voltage
+  float *v;
+  // Cell threshold
+  float *th;
+  // Cell spikes
+  bool *s;
+  // Post-synaptic firing trace
+  float *t;
+  // Constants for addition of voltage, threshold and trace
+  float a_v;
+  float a_th;
+  float a_t;
+  // Constants for decay of voltage, threshold and trace
+  float d_v;
+  float d_th;
+  float d_t;
+  // Constants for resetting voltage and threshold
+  float v_rest;
+  float th_rest;
+  // Neuron layer size
+  int size;
 } Neuron;
 
 // Build neuron
@@ -67,4 +65,5 @@ void update_voltage(Neuron *n);
 void update_threshold(Neuron *n);
 
 // Forward
-void forward_neuron(Neuron *n, int const post, int const pre, float const x[post][pre]);
+void forward_neuron(Neuron *n, int const post, int const pre,
+                    float const x[post][pre]);

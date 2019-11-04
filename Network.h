@@ -1,29 +1,28 @@
 #pragma once
 
-#include "Neuron.h"
 #include "Connection.h"
+#include "Neuron.h"
 
-typedef struct
-{
-    // Input neurons (just a placeholder)
-    float *in;
-    // Connection input -> hidden
-    Connection *inhid;
-    // Hidden neurons
-    Neuron *hid;
-    // Connection hidden -> output
-    Connection *hidout;
-    // Output neurons
-    Neuron *out;
-    // Input and output shape
-    int *in_shape;
-    int *out_shape;
+typedef struct {
+  // Input neurons (just a placeholder)
+  float *in;
+  // Connection input -> hidden
+  Connection *inhid;
+  // Hidden neurons
+  Neuron *hid;
+  // Connection hidden -> output
+  Connection *hidout;
+  // Output neurons
+  Neuron *out;
+  // Input and output shape
+  int *in_shape;
+  int *out_shape;
 } Network;
 
 // Build network
-Network *build_network(int const *in_shape, int const *out_shape, Neuron const *hid,
-                       Neuron const *out, Connection const *inhid,
-                       Connection const *hidout);
+Network *build_network(int const *in_shape, int const *out_shape,
+                       Neuron const *hid, Neuron const *out,
+                       Connection const *inhid, Connection const *hidout);
 
 // Init/reset state: call inits/resets for children
 void init_network(Network *net);

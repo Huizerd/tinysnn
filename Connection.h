@@ -10,10 +10,10 @@ typedef struct {
 } Connection;
 
 // Build connection
-Connection *build_connection(int const *shape)
+Connection *build_connection(int const *shape);
 
-    // Init/reset connection
-    void init_connection(Connection *c);
+// Init/reset connection
+void init_connection(Connection *c);
 
 // Load parameters for connection from text
 // Only w

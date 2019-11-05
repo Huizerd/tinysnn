@@ -5,7 +5,6 @@
 
 // Test neuron forward functions
 int main() {
-  // Incoming inputs from connection
   // Neuron layer size
   int const size = 2;
 

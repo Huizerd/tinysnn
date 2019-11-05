@@ -31,10 +31,11 @@ void reset_connection(Connection *c) {
 
 // Load parameters for connection (weights) from text
 void load_connection(Connection *c, char const path[]) {
-  // File containing weights
-  // TODO: add some checking?
-  // TODO: use exit(1)
-  FILE const *file = fopen(path, "r");
+  // Read file containing weights
+  FILE *file;
+  if ((file = fopen(path, "r")) == NULL) {
+    exit(1);
+  }
   // Consists of "post" lines of "pre" weights
   for (int i = 0; i < c->post; i++) {
     for (int j = 0; j < c->pre; j++) {

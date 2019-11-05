@@ -61,8 +61,10 @@ void reset_neuron(Neuron *n) {
 void load_neuron(Neuron *n, char const path[]) {
   // File containing neuron parameters
   // const here gives warning
-  // TODO: add some checking?
-  FILE *file = fopen(path, "r");
+  FILE *file;
+  if ((file = fopen(path, "r")) == NULL) {
+    exit(1);
+  }
   // Consists of only single line:
   // a_v, a_th, a_t, d_v, d_th, d_t, v_rest, th_rest, type
   // Type cast to integer pointer for neuron type

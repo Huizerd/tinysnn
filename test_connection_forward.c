@@ -1,53 +1,38 @@
-#include "Neuron.h"
+#include "Connection.h"
 #include "functional.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 
-// Test neuron forward functions
+// Test connection forward functions
 int main() {
-  // Incoming inputs from connection
-  // Neuron layer size
-  int const size = 2;
+  // Connection shape: (post, pre) neurons
+  int const post = 2;
+  int const pre = 4;
 
-  // Build neuron
-  Neuron n = build_neuron(size);
-  // Init neuron
-  reset_neuron(&n);
-  // Set input to neuron
-  for (int i = 0; i < size; i++) {
-    n.x[i] = i * 4.0f + 0.5f;
-  }
+  // Build connection
+  Connection c = build_connection(post, pre);
+  // Init connection
+  reset_connection(&c);
+  // Allocate arrays for spikes of pre neuron and inputs to post neuron
+  bool const s[4] = {true, false, false, true};
+  float x[2] = {0.0f};
 
-  // Print neuron parameters
-  printf("Neuron type: %d\n", n.type);
-  printf("Input [0]: %.2f\n", n.x[0]);
-  printf("Voltage [0]: %.2f\n", n.v[0]);
-  printf("Threshold [0]: %.2f\n", n.th[0]);
-  printf("Spikes [0]: %d\n", n.s[0]);
-  printf("Trace [0]: %.2f\n", n.t[0]);
-  printf("Addition constants: %.2f, %.2f, %.2f\n", n.a_v, n.a_th, n.a_t);
-  printf("Decay constants: %.2f, %.2f, %.2f\n", n.d_v, n.d_th, n.d_t);
-  printf("Reset constants: %.2f, %.2f\n", n.v_rest, n.th_rest);
-  printf("\n");
+  // Forward connection
+  forward_connection(&c, x, s);
 
-  // Forward neuron
-  forward_neuron(&n);
+  // Print pre spikes
+  printf("Pre spikes:\n");
+  print_array_1d_bool(c.pre, s);
+  // Print connection weights
+  printf("Connection weights:\n");
+  print_array_2d(post, pre, c.w);
+  // Print post inputs
+  printf("Post inputs:\n");
+  print_array_1d(c.post, x);
 
-  // Print inputs
-  printf("Inputs:\n");
-  print_array_1d(n.size, n.x);
-  // Print voltage
-  printf("Volts:\n");
-  print_array_1d(n.size, n.v);
-  // Print spikes
-  printf("Spikes:\n");
-  print_array_1d_bool(n.size, n.s);
-  // Print trace
-  printf("Trace:\n");
-  print_array_1d(n.size, n.t);
-
-  // Free neuron memory again
-  free_neuron(&n);
+  // Free connection memory again
+  free_connection(&c);
 
   return 0;
 }

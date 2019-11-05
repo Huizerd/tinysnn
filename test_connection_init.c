@@ -18,6 +18,7 @@ int main() {
 
   // Print connection weights before loading
   printf("Connection weights:\n");
+  // TODO: is actually 1D array but still works, why?
   print_array_2d(post, pre, c.w);
 
   // Load connection weights

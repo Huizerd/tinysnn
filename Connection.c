@@ -1,5 +1,4 @@
 #include "Connection.h"
-#include "functional.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +13,7 @@ Connection build_connection(int const post, int const pre) {
   c.pre = pre;
 
   // Allocate memory for weight array
-  c.w = calloc(c.post * c.pre, sizeof(*c.w));
+  c.w = calloc(post * pre, sizeof(*c.w));
 
   return c;
 }
@@ -30,18 +29,25 @@ void reset_connection(Connection *c) {
 }
 
 // Load parameters for connection (weights) from text
+// TODO: check error checking with Erik again
 void load_connection(Connection *c, char const path[]) {
   // Read file containing weights
   FILE *file;
   if ((file = fopen(path, "r")) == NULL) {
+    printf("Error in loading weight file!\n");
     exit(1);
   }
   // Consists of "post" lines of "pre" weights
+  int n = -1;
   for (int i = 0; i < c->post; i++) {
     for (int j = 0; j < c->pre; j++) {
-      // TODO: does this work?
-      fscanf(file, "%f", &c->w[i * c->pre + j]);
+      fscanf(file, "%f%n", &c->w[i * c->pre + j], &n);
     }
+  }
+  // Exit if something went wrong with loading
+  if (n == -1) {
+    printf("Error in loading weights!\n");
+    exit(1);
   }
   fclose(file);
 }

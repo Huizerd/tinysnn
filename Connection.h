@@ -2,12 +2,13 @@
 
 #include <stdbool.h>
 
-typedef struct {
+typedef struct Connection {
   // Connection shape: (post, pre)
   int post, pre;
   // Connection weights
   // Use a 1D array, since structs don't support variable-sized arrays
   // TODO: is this the best way to go? Would like to be able to do w[i][j]
+  //  Check this with Erik
   float *w;
 } Connection;
 

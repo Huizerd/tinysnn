@@ -15,8 +15,11 @@ typedef struct Connection {
 // Build connection
 Connection build_connection(int const post, int const pre);
 
-// Init/reset connection
-// Actually, only init, but name reset to stay consistent with neurons
+// Init connection
+void init_connection(Connection *c);
+
+// Reset connection
+// Doesn't actually do anything, just for consistency
 void reset_connection(Connection *c);
 
 // Load parameters for connection from text

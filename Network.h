@@ -23,7 +23,10 @@ typedef struct Network {
 Network build_network(int const in_size, int const hid_size,
                       int const out_size);
 
-// Init/reset network: calls init/reset functions for children
+// Init network: calls init functions for children
+void init_network(Network *net);
+
+// Reset network: calls reset functions for children
 void reset_network(Network *net);
 
 // Load parameters for network from text and call load functions for children

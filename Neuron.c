@@ -39,7 +39,25 @@ Neuron build_neuron(int const size) {
   return n;
 }
 
-// Init/reset neuron (inputs, voltage, spikes, threshold, trace)
+// Init neuron (inputs, voltage, spikes, threshold, trace)
+void init_neuron(Neuron *n) {
+  // Loop over neurons
+  for (int i = 0; i < n->size; i++) {
+    // Inputs
+    n->x[i] = 0.0f;
+    // Voltage
+    n->v[i] = n->v_rest;
+    // Spikes
+    n->s[i] = false;
+    // Threshold
+    n->th[i] = n->th_rest;
+    // Trace
+    n->t[i] = 0.0f;
+  }
+}
+
+// Reset neuron (inputs, voltage, spikes, threshold, trace)
+// Does the same as init, just for consistency
 void reset_neuron(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {

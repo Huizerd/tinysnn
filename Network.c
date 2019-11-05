@@ -55,8 +55,8 @@ Network build_network(int const in_size, int const hid_size,
   return net;
 }
 
-// Init/reset network: calls init/reset functions for children
-void reset_network(Network *net) {
+// Init network: calls init functions for children
+void init_network(Network *net) {
   // Loop over input placeholders
   for (int i = 0; i < net->in_size; i++) {
     if (i < net->in_size / 2) {
@@ -64,8 +64,15 @@ void reset_network(Network *net) {
     }
     net->in_enc[i] = 0.0f;
   }
-  // Call init/reset functions for children
-  // TODO: will this become a pointer to a pointer? Should we do net.inhid?
+  // Call init functions for children
+  init_connection(net->inhid);
+  init_neuron(net->hid);
+  init_connection(net->hidout);
+  init_neuron(net->out);
+}
+
+// Reset network: calls reset functions for children
+void reset_network(Network *net) {
   reset_connection(net->inhid);
   reset_neuron(net->hid);
   reset_connection(net->hidout);
@@ -138,6 +145,7 @@ void load_network(Network *net, char const path[]) {
 // Free allocated memory for network and call free functions for children
 void free_network(Network *net) {
   // Call free functions for children
+  // Freeing in a bottom-up manner
   // TODO: or should we call this before freeing the network struct members?
   free_connection(net->inhid);
   free_neuron(net->hid);

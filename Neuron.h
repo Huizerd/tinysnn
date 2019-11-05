@@ -34,7 +34,11 @@ typedef struct Neuron {
 // Build neuron
 Neuron build_neuron(int const size);
 
-// Init/reset neuron (inputs, voltage, spikes, threshold, trace)
+// Init neuron (inputs, voltage, spikes, threshold, trace)
+void init_neuron(Neuron *n);
+
+// Reset neuron (inputs, voltage, spikes, threshold, trace)
+// Does the same as init, just for consistency
 void reset_neuron(Neuron *n);
 
 // Load parameters for neuron from text

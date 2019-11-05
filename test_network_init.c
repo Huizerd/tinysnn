@@ -15,7 +15,7 @@ int main() {
   // Build network
   Network net = build_network(in_size, hid_size, out_size);
   // Init network
-  reset_network(&net);
+  init_network(&net);
 
   // Print network parameters before loading
   // Input layer
@@ -74,7 +74,7 @@ int main() {
 
   // Load network parameters
   load_network(&net, param_path);
-  //  reset_network(&net);
+  reset_network(&net);
 
   // Print network parameters after loading
   // Input layer

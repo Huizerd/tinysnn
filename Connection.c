@@ -18,8 +18,8 @@ Connection build_connection(int const post, int const pre) {
   return c;
 }
 
-// Init/reset connection
-void reset_connection(Connection *c) {
+// Init connection
+void init_connection(Connection *c) {
   // Loop over weights
   for (int i = 0; i < c->post; i++) {
     for (int j = 0; j < c->pre; j++) {
@@ -27,6 +27,10 @@ void reset_connection(Connection *c) {
     }
   }
 }
+
+// Reset connection
+// Doesn't actually do anything, just for consistency
+void reset_connection(Connection *c) {}
 
 // Load parameters for connection (weights) from text
 // TODO: check error checking with Erik again

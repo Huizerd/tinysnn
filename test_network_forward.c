@@ -5,6 +5,8 @@
 
 // Test network forward functions
 int main() {
+  // File containing parameters
+  char const param_path[] = "param/test_network_params.txt";
   // Network layer sizes
   int const in_size = 2;
   int const hid_size = 4;
@@ -18,6 +20,10 @@ int main() {
   for (int i = 0; i < in_size / 2; i++) {
     net.in[i] = 2.0f;
   }
+
+  // Load network parameters
+  load_network(&net, param_path);
+  reset_network(&net);
 
   // Forward network
   float output = forward_network(&net);

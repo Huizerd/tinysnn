@@ -172,7 +172,6 @@ void forward_neuron(Neuron *n) {
   // Update trace
   update_trace(n);
   // Update thresh (if adaptive)
-  // TODO: still needs testing
   if (n->type == ALIF) {
     update_threshold(n);
   }

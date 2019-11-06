@@ -6,7 +6,7 @@
 // Test network initialization functions
 int main() {
   // File containing parameters
-  char const param_path[] = "test_network_params.txt";
+  char const param_path[] = "param/test_network_params.txt";
   // Network layer sizes
   int const in_size = 2;
   int const hid_size = 4;

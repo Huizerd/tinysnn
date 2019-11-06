@@ -6,7 +6,7 @@
 // Test connection initialization functions
 int main() {
   // File containing weights
-  char const weight_path[] = "test_connection_weights.txt";
+  char const weight_path[] = "param/test_connection_weights.txt";
   // Connection shape: (post, pre) neurons
   int const post = 2;
   int const pre = 4;
@@ -14,7 +14,7 @@ int main() {
   // Build connection
   Connection c = build_connection(post, pre);
   // Init connection
-  reset_connection(&c);
+  init_connection(&c);
 
   // Print connection weights before loading
   printf("Connection weights:\n");

@@ -1,7 +1,6 @@
 #include "Connection.h"
 #include "functional.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 
 // Test connection forward functions
@@ -13,9 +12,9 @@ int main() {
   // Build connection
   Connection c = build_connection(post, pre);
   // Init connection
-  reset_connection(&c);
+  init_connection(&c);
   // Allocate arrays for spikes of pre neuron and inputs to post neuron
-  bool const s[4] = {true, false, false, true};
+  float const s[4] = {1.0f, 0.0f, 0.0f, 1.0f};
   float x[2] = {0.0f};
 
   // Forward connection

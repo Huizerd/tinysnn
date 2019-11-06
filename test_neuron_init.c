@@ -6,14 +6,14 @@
 // Test neuron initialization functions
 int main() {
   // File containing parameters
-  char const param_path[] = "test_neuron_params.txt";
+  char const param_path[] = "param/test_neuron_params.txt";
   // Neuron layer size
   int const size = 4;
 
   // Build neuron
   Neuron n = build_neuron(size);
   // Init neuron
-  reset_neuron(&n);
+  init_neuron(&n);
 
   // Print neuron parameters before loading
   printf("Neuron type: %d\n", n.type);

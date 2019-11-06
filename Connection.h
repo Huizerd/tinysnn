@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
 typedef struct Connection {
   // Connection shape: (post, pre)
   int post, pre;
@@ -30,4 +28,5 @@ void load_connection(Connection *c, char const path[]);
 void free_connection(Connection *c);
 
 // Forward
-void forward_connection(Connection *c, float x[], bool const s[]);
+// Spikes as floats to deal with real-valued inputs
+void forward_connection(Connection *c, float x[], float const s[]);

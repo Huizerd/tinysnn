@@ -1,6 +1,5 @@
 #include "Neuron.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -48,7 +47,7 @@ void init_neuron(Neuron *n) {
     // Voltage
     n->v[i] = n->v_rest;
     // Spikes
-    n->s[i] = false;
+    n->s[i] = 0.0f;
     // Threshold
     n->th[i] = n->th_rest;
     // Trace
@@ -66,7 +65,7 @@ void reset_neuron(Neuron *n) {
     // Voltage
     n->v[i] = n->v_rest;
     // Spikes
-    n->s[i] = false;
+    n->s[i] = 0.0f;
     // Threshold
     n->th[i] = n->th_rest;
     // Trace
@@ -113,7 +112,7 @@ static void spiking(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // If above/equal to threshold: set spike, else don't
-    n->s[i] = n->v[i] >= n->th[i] ? true : false;
+    n->s[i] = n->v[i] >= n->th[i] ? 1.0f : 0.0f;
   }
 }
 
@@ -123,7 +122,8 @@ static void refrac(Neuron *n) {
   for (int i = 0; i < n->size; i++) {
     // If spike, then refraction
     // We don't have a refractory period, so no need to take care of that
-    n->v[i] = n->s[i] == true ? n->v_rest : n->v[i];
+    // TODO: how dangerous is checking for equality with floats?
+    n->v[i] = n->s[i] == 1.0f ? n->v_rest : n->v[i];
   }
 }
 
@@ -135,7 +135,7 @@ static void update_trace(Neuron *n) {
   for (int i = 0; i < n->size; i++) {
     // First decay trace, then increase for outgoing spikes
     n->t[i] *= n->d_t;
-    n->t[i] += n->a_t * (float)n->s[i];
+    n->t[i] += n->a_t * n->s[i];
   }
 }
 
@@ -156,7 +156,7 @@ static void update_threshold(Neuron *n) {
   for (int i = 0; i < n->size; i++) {
     // First decay threshold, then increase for outgoing spikes
     n->th[i] *= n->d_th;
-    n->th[i] += n->a_th * (float)n->s[i];
+    n->th[i] += n->a_th * n->s[i];
   }
 }
 

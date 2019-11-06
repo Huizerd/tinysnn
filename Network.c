@@ -170,9 +170,9 @@ static void encode_network(int const size, float x[size / 2],
   // and make absolute
   for (int i = 0; i < size; i++) {
     if (i < size / 2) {
-      x_enc[i] = fminf(0.0f, x[i % 2]);
+      x_enc[i] = fmaxf(0.0f, x[i % (size / 2)]);
     } else {
-      x_enc[i] = fabs(fmaxf(0.0f, x[i % 2]));
+      x_enc[i] = fabs(fminf(0.0f, x[i % (size / 2)]));
     }
   }
 }
@@ -192,8 +192,7 @@ float forward_network(Network *net) {
   // Encode input from scalar value to currents
   encode_network(net->in_size, net->in, net->in_enc);
   // Call forward functions for children
-  // TODO: net->in is float instead of bool, how to solve this? Or leave it?
-  forward_connection(net->inhid, net->hid->x, net->in);
+  forward_connection(net->inhid, net->hid->x, net->in_enc);
   forward_neuron(net->hid);
   forward_connection(net->hidout, net->out->x, net->hid->s);
   forward_neuron(net->out);

@@ -1,4 +1,0 @@
-test_connection_weights_inhid.txt
-test_neuron_params_hid.txt
-test_connection_weights_hidout.txt
-test_neuron_params_out.txt

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
-
 // Enumeration for neuron types: regular LIF and adaptive LIF
 typedef enum NeuronType { RLIF, ALIF } NeuronType;
 
@@ -20,7 +18,7 @@ typedef struct Neuron {
   // Cell threshold
   float *th;
   // Cell spikes
-  bool *s;
+  float *s;
   // Post-synaptic firing trace
   float *t;
   // Constants for addition of voltage, threshold and trace

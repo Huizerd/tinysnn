@@ -64,11 +64,12 @@ void free_connection(Connection *c) {
 }
 
 // Forward
-void forward_connection(Connection *c, float x[], bool const s[]) {
+// Spikes as floats to deal with real-valued inputs
+void forward_connection(Connection *c, float x[], float const s[]) {
   // Loop over weights and multiply with spikes
   for (int i = 0; i < c->post; i++) {
     for (int j = 0; j < c->pre; j++) {
-      x[i] += c->w[i * c->pre + j] * (float)s[j];
+      x[i] += c->w[i * c->pre + j] * s[j];
     }
   }
 }

@@ -1,6 +1,7 @@
 #include "Network.h"
 #include "Connection.h"
 #include "Neuron.h"
+#include "functional.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -159,6 +160,61 @@ void free_network(Network *net) {
   free(net->hid);
   free(net->hidout);
   free(net->out);
+}
+
+// Print network parameters (for debugging purposes)
+void print_network(Network *net) {
+  // Input layer
+  printf("Input layer (raw):\n");
+  print_array_1d(net->in_size / 2, net->in);
+  printf("Input layer (encoded):\n");
+  print_array_1d(net->in_size, net->in_enc);
+
+  // Connection input -> hidden
+  printf("Connection weights input -> hidden:\n");
+  print_array_2d(net->hid_size, net->in_size, net->inhid->w);
+
+  // Hidden layer
+  printf("Neuron type: %d\n", net->hid->type);
+  printf("Input:\n");
+  print_array_1d(net->hid_size, net->hid->x);
+  printf("Voltage:\n");
+  print_array_1d(net->hid_size, net->hid->v);
+  printf("Threshold:\n");
+  print_array_1d(net->hid_size, net->hid->th);
+  printf("Spikes:\n");
+  print_array_1d_bool(net->hid_size, net->hid->s);
+  printf("Trace:\n");
+  print_array_1d(net->hid_size, net->hid->t);
+  printf("Addition constants: %.2f, %.2f, %.2f\n", net->hid->a_v,
+         net->hid->a_th, net->hid->a_t);
+  printf("Decay constants: %.2f, %.2f, %.2f\n", net->hid->d_v, net->hid->d_th,
+         net->hid->d_t);
+  printf("Reset constants: %.2f, %.2f\n", net->hid->v_rest, net->hid->th_rest);
+  printf("\n");
+
+  // Connection hidden -> output
+  printf("Connection weights hidden -> output:\n");
+  print_array_2d(net->out_size, net->hid_size, net->hidout->w);
+
+  // Output layer
+  printf("Neuron type: %d\n", net->out->type);
+  printf("Input:\n");
+  print_array_1d(net->out_size, net->out->x);
+  printf("Voltage:\n");
+  print_array_1d(net->out_size, net->out->v);
+  printf("Threshold:\n");
+  print_array_1d(net->out_size, net->out->th);
+  printf("Spikes:\n");
+  print_array_1d_bool(net->out_size, net->out->s);
+  printf("Trace:\n");
+  print_array_1d(net->out_size, net->out->t);
+  printf("Addition constants: %.2f, %.2f, %.2f\n", net->out->a_v,
+         net->out->a_th, net->out->a_t);
+  printf("Decay constants: %.2f, %.2f, %.2f\n", net->out->d_v, net->out->d_th,
+         net->out->d_t);
+  printf("Reset constants: %.2f, %.2f\n", net->out->v_rest, net->out->th_rest);
+  printf("\n");
 }
 
 // Encode to current

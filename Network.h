@@ -36,6 +36,9 @@ void load_network(Network *net, char const path[]);
 // Free allocated memory for network and call free functions for children
 void free_network(Network *net);
 
+// Print network parameters (for debugging purposes)
+void print_network(Network *net);
+
 // Forward network and call forward functions for children
 // Encoding and decoding inside
 float forward_network(Network *net);

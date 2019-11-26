@@ -160,6 +160,15 @@ static void update_threshold(Neuron *n) {
   }
 }
 
+// Update/reset inputs (otherwise accumulation over time)
+static void update_inputs(Neuron *n) {
+  // Loop over neurons
+  for (int i = 0; i < n->size; i++) {
+    // Set to zero
+    n->x[i] = 0.0f;
+  }
+}
+
 // Forward: encompasses voltage/trace/threshold updates, spiking and refraction
 // TODO: use above functions or write new loop which does all in one (and use
 //  above for inspiration)
@@ -177,6 +186,8 @@ void forward_neuron(Neuron *n) {
   }
   // Refraction
   refrac(n);
+  // Reset inputs (otherwise we get accumulation over time)
+  update_inputs(n);
   // No return, spikes are a member of Neuron struct and can be used for next
   // layer
 }

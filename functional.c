@@ -5,7 +5,7 @@
 // Print 1D array of floats (as floats)
 void print_array_1d(int const size, float const x[size]) {
   for (int i = 0; i < size; i++) {
-    printf("%.2f ", x[i]);
+    printf("%.4f ", x[i]);
   }
   printf("\n\n");
 }
@@ -22,7 +22,7 @@ void print_array_1d_bool(int const size, float const x[size]) {
 void print_array_2d(int const rows, int const cols, float const x[rows][cols]) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++) {
-      printf("%.2f ", x[i][j]);
+      printf("%.4f ", x[i][j]);
     }
     printf("\n");
   }

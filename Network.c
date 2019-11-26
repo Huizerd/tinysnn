@@ -186,11 +186,11 @@ void print_network(Network *net) {
   print_array_1d_bool(net->hid_size, net->hid->s);
   printf("Trace:\n");
   print_array_1d(net->hid_size, net->hid->t);
-  printf("Addition constants: %.2f, %.2f, %.2f\n", net->hid->a_v,
+  printf("Addition constants: %.4f, %.4f, %.4f\n", net->hid->a_v,
          net->hid->a_th, net->hid->a_t);
-  printf("Decay constants: %.2f, %.2f, %.2f\n", net->hid->d_v, net->hid->d_th,
+  printf("Decay constants: %.4f, %.4f, %.4f\n", net->hid->d_v, net->hid->d_th,
          net->hid->d_t);
-  printf("Reset constants: %.2f, %.2f\n", net->hid->v_rest, net->hid->th_rest);
+  printf("Reset constants: %.4f, %.4f\n", net->hid->v_rest, net->hid->th_rest);
   printf("\n");
 
   // Connection hidden -> output
@@ -209,11 +209,11 @@ void print_network(Network *net) {
   print_array_1d_bool(net->out_size, net->out->s);
   printf("Trace:\n");
   print_array_1d(net->out_size, net->out->t);
-  printf("Addition constants: %.2f, %.2f, %.2f\n", net->out->a_v,
+  printf("Addition constants: %.4f, %.4f, %.4f\n", net->out->a_v,
          net->out->a_th, net->out->a_t);
-  printf("Decay constants: %.2f, %.2f, %.2f\n", net->out->d_v, net->out->d_th,
+  printf("Decay constants: %.4f, %.4f, %.4f\n", net->out->d_v, net->out->d_th,
          net->out->d_t);
-  printf("Reset constants: %.2f, %.2f\n", net->out->v_rest, net->out->th_rest);
+  printf("Reset constants: %.4f, %.4f\n", net->out->v_rest, net->out->th_rest);
   printf("\n");
 }
 

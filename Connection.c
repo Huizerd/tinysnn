@@ -32,28 +32,22 @@ void init_connection(Connection *c) {
 // Doesn't actually do anything, just for consistency
 void reset_connection(Connection *c) {}
 
-// Load parameters for connection (weights) from text
-// TODO: check error checking with Erik again
-void load_connection(Connection *c, char const path[]) {
-  // Read file containing weights
-  FILE *file;
-  if ((file = fopen(path, "r")) == NULL) {
-    printf("Error in loading weight file!\n");
+// Load parameters for connection (weights) from a header file
+// (using the ConnectionConf struct)
+void load_connection_from_header(Connection *c, ConnectionConf const *conf) {
+  // Check if same shape
+  if ((c->pre != conf->pre) || (c->post != conf->post)) {
+    printf("Connection has a different shape than specified in the "
+           "ConnectionConf!\n");
     exit(1);
   }
-  // Consists of "post" lines of "pre" weights
-  int n = -1;
+  // Loop over weights
+  // TODO: could also be done by just exchanging pointers to arrays?
   for (int i = 0; i < c->post; i++) {
     for (int j = 0; j < c->pre; j++) {
-      fscanf(file, "%f%n", &c->w[i * c->pre + j], &n);
+      c->w[i * c->pre + j] = conf->w[i * c->pre + j];
     }
   }
-  // Exit if something went wrong with loading
-  if (n == -1) {
-    printf("Error in loading weights!\n");
-    exit(1);
-  }
-  fclose(file);
 }
 
 // Free allocated memory for connection

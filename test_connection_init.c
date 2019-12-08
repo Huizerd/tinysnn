@@ -1,12 +1,13 @@
 #include "Connection.h"
 #include "functional.h"
 
+// Header file containing parameters
+#include "param/test_connection_conf.h"
+
 #include <stdio.h>
 
 // Test connection initialization functions
 int main() {
-  // File containing weights
-  char const weight_path[] = "param/test_connection_weights.txt";
   // Connection shape: (post, pre) neurons
   int const post = 2;
   int const pre = 4;
@@ -21,10 +22,12 @@ int main() {
   // TODO: is actually 1D array but still works, why?
   print_array_2d(post, pre, c.w);
 
-  // Load connection weights
-  load_connection(&c, weight_path);
+  // Load connection weights from header
+  load_connection_from_header(&c, &conf);
+  reset_connection(&c); // does nothing
 
-  // Print connection weights after loading
+  // Print connection weights after header loading
+  printf("\nHeader loading\n\n");
   printf("Connection weights:\n");
   print_array_2d(post, pre, c.w);
 

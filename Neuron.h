@@ -22,29 +22,49 @@ typedef struct Neuron {
   // Post-synaptic firing trace
   float *t;
   // Constants for addition of voltage, threshold and trace
-  float a_v, a_th, a_t;
+  float *a_v, *a_th, *a_t;
   // Constants for decay of voltage, threshold and trace
-  float d_v, d_th, d_t;
+  float *d_v, *d_th, *d_t;
   // Constants for resetting voltage and threshold
-  float v_rest, th_rest;
+  float v_rest, *th_rest;
+  // Counter for spikes
+  int s_count;
 } Neuron;
+
+// Struct that holds the configuration of a layer of neurons
+// To be used when loading parameters from a header file
+typedef struct NeuronConf {
+  // Neuron type
+  NeuronType const type;
+  // Neuron layer size
+  int const size;
+  // Constants for addition of voltage, threshold and trace
+  float const *a_v, *a_th, *a_t;
+  // Constants for decay of voltage, threshold and trace
+  float const *d_v, *d_th, *d_t;
+  // Constants for resetting voltage and threshold
+  float const v_rest, *th_rest;
+} NeuronConf;
 
 // Build neuron
 Neuron build_neuron(int const size);
 
-// Init neuron (inputs, voltage, spikes, threshold, trace)
+// Init neuron (addition/decay/reset constants, inputs, voltage, spikes,
+// threshold, trace)
 void init_neuron(Neuron *n);
 
 // Reset neuron (inputs, voltage, spikes, threshold, trace)
-// Does the same as init, just for consistency
 void reset_neuron(Neuron *n);
 
-// Load parameters for neuron from text
+// Load parameters for neuron from header file (using the NeuronConf struct)
 // a_v, a_th, a_t, d_v, d_th, d_t, v_rest, th_rest, type
-void load_neuron(Neuron *n, char const path[]);
+void load_neuron_from_header(Neuron *n, NeuronConf const *conf);
 
 // Free allocated memory for neuron
 void free_neuron(Neuron *n);
+
+// Print neuron parameters
+void print_neuron(Neuron const *n);
 
 // Forward
 void forward_neuron(Neuron *n);

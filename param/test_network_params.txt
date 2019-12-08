@@ -1,4 +1,0 @@
-param/test_connection_weights_inhid.txt
-param/test_neuron_params_hid.txt
-param/test_connection_weights_hidout.txt
-param/test_neuron_params_out.txt

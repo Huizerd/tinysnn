@@ -10,6 +10,8 @@ typedef enum EncodingType { BOTH, PLACE } EncodingType;
 typedef struct Network {
   // Encoding type
   EncodingType type;
+  // Decoding scale
+  float decoding_scale;
   // We need place cell centers if we have place cell encoding
   float *centers;
   // Input, encoded input, hidden and output layer sizes
@@ -32,6 +34,8 @@ typedef struct Network {
 typedef struct NetworkConf {
   // Encoding type
   EncodingType const type;
+  // Decoding scale
+  float decoding_scale;
   // Place cell centers (just BS if we don't use them)
   float const *centers;
   // Input, encoded input, hidden and output layer sizes

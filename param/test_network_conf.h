@@ -9,7 +9,8 @@
 // Place cell centers as const array here, use pointer in configuration struct
 float const centers[] = {0.2f, 0.4f};
 
-// type, centers, in_size, in_enc_size, hid_size, out_size, inhid, hid, hidout,
-// out
-NetworkConf const conf = {
-    1, centers, 1, 2, 4, 1, &conf_inhid, &conf_hid, &conf_hidout, &conf_out};
+// type, decoding_scale, centers, in_size, in_enc_size, hid_size, out_size,
+// inhid, hid, hidout, out
+NetworkConf const conf = {1,        2.0f, centers,     1,         2,
+                          4,        1,    &conf_inhid, &conf_hid, &conf_hidout,
+                          &conf_out};

@@ -17,6 +17,9 @@ Network build_network(int const in_size, int const in_enc_size,
   // Set encoding type
   net.type = BOTH;
 
+  // Set decoding scale
+  net.decoding_scale = 1.0f;
+
   // Set sizes
   // Output size has to be 1
   if (out_size != 1) {
@@ -87,6 +90,8 @@ void load_network_from_header(Network *net, NetworkConf const *conf) {
   }
   // Encoding
   net->type = conf->type;
+  // Decoding
+  net->decoding_scale = conf->decoding_scale;
   // Place cell centers (just BS if we don't use them)
   for (int i = 0; i < net->in_enc_size; i++) {
     net->centers[i] = conf->centers[i];
@@ -127,6 +132,9 @@ void print_network(Network const *net) {
   printf("Encoding type: %d\n", net->type);
   printf("Place cell centers:\n");
   print_array_1d(net->in_enc_size, net->centers);
+
+  // Decoding scale
+  printf("Decoding scale: %.4f\n\n", net->decoding_scale);
 
   // Input layer
   printf("Input layer (raw):\n");
@@ -191,9 +199,10 @@ static void encode_place(int const size, int const enc_size, float x[size],
 // Decode from trace
 // Mind to take into account the trace scaling
 // TODO: also load parameters for this?
-static float decode_network(int const size, float const t[size]) {
+static float decode_network(int const size, float const t[size],
+                            float const scale) {
   // Scale with output range and maximum trace and apply potential offset
-  float output = -0.8f + (0.5f + 0.8f) * (t[0] / 1.0f + 0.0f);
+  float output = -0.8f + (0.5f + 0.8f) * (t[0] / scale + 0.0f);
 
   return output;
 }
@@ -215,7 +224,8 @@ float forward_network(Network *net) {
   forward_connection(net->hidout, net->out->x, net->hid->s);
   forward_neuron(net->out);
   // Decode output neuron traces to scalar value
-  float output = decode_network(net->out_size, net->out->t);
+  float output =
+      decode_network(net->out_size, net->out->t, net->decoding_scale);
 
   return output;
 }

@@ -31,6 +31,8 @@ int main() {
   printf("Encoding type: %d\n", net.type);
   printf("Place cell centers:\n");
   print_array_1d(net.in_enc_size, net.centers);
+  // Decoding scale
+  printf("Decoding scale: %.4f\n\n", net.decoding_scale);
   // Print network inputs
   printf("Network inputs:\n");
   print_array_1d(net.in_size, net.in);

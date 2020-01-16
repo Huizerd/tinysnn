@@ -6,7 +6,7 @@
 // Enumeration for network encoding types: div+divdot and div place cells
 typedef enum EncodingType { BOTH, PLACE } EncodingType;
 
-// Struct that defines a network of two spiking layers
+// Struct that defines a network of one spiking layer
 typedef struct Network {
   // Encoding type
   EncodingType type;
@@ -14,22 +14,18 @@ typedef struct Network {
   float decoding_scale;
   // We need place cell centers if we have place cell encoding
   float *centers;
-  // Input, encoded input, hidden and output layer sizes
-  int in_size, in_enc_size, hid_size, out_size;
+  // Input, encoded input and output layer sizes
+  int in_size, in_enc_size, out_size;
   // Two input place holders: one for scalar values
   // and one for encoded currents (size in_size)
   float *in, *in_enc;
-  // Connection input -> hidden
-  Connection *inhid;
-  // Hidden neurons
-  Neuron *hid;
-  // Connection hidden -> output
-  Connection *hidout;
+  // Connection input -> output
+  Connection *inout;
   // Output neurons
   Neuron *out;
 } Network;
 
-// Struct that holds the configuration of a two-layer network
+// Struct that holds the configuration of a one-layer network
 // To be used when loading parameters from a header file
 typedef struct NetworkConf {
   // Encoding type
@@ -38,21 +34,17 @@ typedef struct NetworkConf {
   float decoding_scale;
   // Place cell centers (just BS if we don't use them)
   float const *centers;
-  // Input, encoded input, hidden and output layer sizes
-  int const in_size, in_enc_size, hid_size, out_size;
-  // Connection input -> hidden
-  ConnectionConf const *inhid;
-  // Hidden neurons
-  NeuronConf const *hid;
-  // Connection hidden -> output
-  ConnectionConf const *hidout;
+  // Input, encoded input and output layer sizes
+  int const in_size, in_enc_size, out_size;
+  // Connection input -> output
+  ConnectionConf const *inout;
   // Output neurons
   NeuronConf const *out;
 } NetworkConf;
 
 // Build network: calls build functions for children
 Network build_network(int const in_size, int const in_enc_size,
-                      int const hid_size, int const out_size);
+                      int const out_size);
 
 // Init network: calls init functions for children
 void init_network(Network *net);

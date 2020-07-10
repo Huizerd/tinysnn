@@ -28,11 +28,16 @@ int main() {
   // Print network state
   printf("\nHeader loading\n\n");
   // Encoding type
-  printf("Encoding type: %d\n", net.type);
+  printf("Encoding type: %d\n", net.enc_type);
   printf("Place cell centers:\n");
   print_array_1d(net.in_enc_size, net.centers);
+  // Decoding type
+  printf("Decoding type: %d\n", net.dec_type);
   // Decoding scale
   printf("Decoding scale: %.4f\n\n", net.decoding_scale);
+  // Decoding actions
+  printf("Action vector:\n");
+  print_array_1d(net.out_size, net.actions);
   // Print network inputs
   printf("Network inputs:\n");
   print_array_1d(net.in_size, net.in);

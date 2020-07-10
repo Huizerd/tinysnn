@@ -3,15 +3,27 @@
 #include "Connection.h"
 #include "Neuron.h"
 
-// Enumeration for network encoding types: div+divdot and div place cells
-typedef enum EncodingType { BOTH, PLACE } EncodingType;
+// Enumeration for network encoding types:
+// - div+divdot
+// - div place cells
+// - div+divdot, but div setpoint (0.5) subtracted
+typedef enum EncodingType { BOTH, PLACE, ERROR05 } EncodingType;
+
+// Enumeration for network decoding types:
+// - action from scaled single trace
+// - actions weighted by trace
+typedef enum DecodingType { SINGLE, WEIGHTED } DecodingType;
 
 // Struct that defines a network of two spiking layers
 typedef struct Network {
   // Encoding type
-  EncodingType type;
+  EncodingType enc_type;
+  // Decoding type
+  DecodingType dec_type;
   // Decoding scale
   float decoding_scale;
+  // Decoding action vector
+  float* actions;
   // We need place cell centers if we have place cell encoding
   float *centers;
   // Input, encoded input, hidden and output layer sizes
@@ -33,9 +45,13 @@ typedef struct Network {
 // To be used when loading parameters from a header file
 typedef struct NetworkConf {
   // Encoding type
-  EncodingType const type;
+  EncodingType const enc_type;
+  // Decoding type
+  DecodingType const dec_type;
   // Decoding scale
   float decoding_scale;
+  // Decoding action vector (just BS if we don't use them)
+  float const *actions;
   // Place cell centers (just BS if we don't use them)
   float const *centers;
   // Input, encoded input, hidden and output layer sizes

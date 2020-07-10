@@ -15,26 +15,24 @@ Network build_network(int const in_size, int const in_enc_size,
   Network net;
 
   // Set encoding type
-  net.type = BOTH;
+  net.enc_type = BOTH;
+  // Set decoding type
+  net.dec_type = SINGLE;
 
   // Set decoding scale
   net.decoding_scale = 1.0f;
 
   // Set sizes
-  // Output size has to be 1
-  if (out_size != 1) {
-    printf("Network output size should be 1!\n");
-    exit(1);
-  }
   net.in_size = in_size;
   net.in_enc_size = in_enc_size;
   net.hid_size = hid_size;
   net.out_size = out_size;
 
-  // Allocate memory for input placeholders, place cell centers and underlying
-  // neurons and connections
+  // Allocate memory for input placeholders, action, place cell centers
+  // and underlying neurons and connections
   net.in = calloc(in_size, sizeof(*net.in));
   net.in_enc = calloc(in_enc_size, sizeof(*net.in_enc));
+  net.actions = calloc(out_size, sizeof(*net.actions));
   net.centers = calloc(in_enc_size, sizeof(*net.centers));
   // TODO: is this the best way to do this? Or let network struct consist of
   //  actual structs instead of pointers to structs?
@@ -54,13 +52,16 @@ Network build_network(int const in_size, int const in_enc_size,
 
 // Init network: calls init functions for children
 void init_network(Network *net) {
-  // Loop over input placeholders
+  // Loop over placeholders
   for (int i = 0; i < net->in_size; i++) {
     net->in[i] = 0.0f;
   }
   for (int i = 0; i < net->in_enc_size; i++) {
     net->in_enc[i] = 0.0f;
     net->centers[i] = 0.0f;
+  }
+  for (int i = 0; i < net->out_size; i++) {
+    net->actions[i] = 0.0f;
   }
   // Call init functions for children
   init_connection(net->inhid);
@@ -89,9 +90,14 @@ void load_network_from_header(Network *net, NetworkConf const *conf) {
     exit(1);
   }
   // Encoding
-  net->type = conf->type;
+  net->enc_type = conf->enc_type;
   // Decoding
+  net->dec_type = conf->dec_type;
   net->decoding_scale = conf->decoding_scale;
+  // Action vector (just BS if we don't use them)
+  for (int i = 0; i < net->out_size; i++) {
+    net->actions[i] = conf->actions[i];
+  }
   // Place cell centers (just BS if we don't use them)
   for (int i = 0; i < net->in_enc_size; i++) {
     net->centers[i] = conf->centers[i];
@@ -119,6 +125,7 @@ void free_network(Network *net) {
   // connections
   free(net->in);
   free(net->in_enc);
+  free(net->actions);
   free(net->centers);
   free(net->inhid);
   free(net->hid);
@@ -128,13 +135,16 @@ void free_network(Network *net) {
 
 // Print network parameters (for debugging purposes)
 void print_network(Network const *net) {
-  // Encoding type
-  printf("Encoding type: %d\n", net->type);
+  // Encoding
+  printf("Encoding type: %d\n", net->enc_type);
   printf("Place cell centers:\n");
   print_array_1d(net->in_enc_size, net->centers);
 
-  // Decoding scale
+  // Decoding
+  printf("Decoding type: %d\n", net->dec_type);
   printf("Decoding scale: %.4f\n\n", net->decoding_scale);
+  printf("Action vector:\n");
+  print_array_1d(net->out_size, net->actions);
 
   // Input layer
   printf("Input layer (raw):\n");
@@ -196,15 +206,56 @@ static void encode_place(int const size, int const enc_size, float x[size],
   }
 }
 
-// Decode from trace
+// Encode both divergence and its derivative as current,
+// but subtract the divergence setpoint from the former, giving you error
+// Divergence setpoint D = 0.5
+// TODO: also load parameters for this?
+static void encode_error05(int const size, int const enc_size, float x[size],
+                           float x_enc[enc_size]) {
+  // Subtract setpoint from D
+  x[0] -= 0.5;
+
+  // Repeat inputs, clamp first half to positive, second half to negative
+  // and make absolute
+  for (int i = 0; i < enc_size; i++) {
+    if (i < size) {
+      x_enc[i] = fmaxf(0.0f, x[i % (size)]);
+    } else {
+      x_enc[i] = fabs(fminf(0.0f, x[i % (size)]));
+    }
+  }
+}
+
+// Decode from single trace
 // Mind to take into account the trace scaling
 // TODO: also load parameters for this?
-static float decode_network(int const size, float const t[size],
-                            float const scale) {
+static float decode_singletrace(int const size, float const t[size],
+                                float const scale) {
   // Scale with output range and maximum trace and apply potential offset
   float output = -0.8f + (0.5f + 0.8f) * (t[0] / scale + 0.0f);
 
   return output;
+}
+
+// Decode from weighted sum of traces
+// Mind to take into account the trace scaling
+// TODO: also load parameters for this?
+static float decode_weightedtrace(int const size, float const t[size],
+                                  float const a[size]) {
+  // Weight actions (a) with trace (t)
+  float output = 0.0f;
+  float tsum = 0.0f;
+  for (int i = 0; i < size; i++) {
+    output += t[i] * a[i];
+    tsum += t[i];
+  }
+
+  // Catch divide-by-zero
+  if (tsum == 0.0f) {
+    return 0.0f;
+  } else {
+    return output / tsum;
+  }
 }
 
 // Forward network and call forward functions for children
@@ -212,11 +263,13 @@ static float decode_network(int const size, float const t[size],
 // TODO: but we still need to check the size of the array we put in net->in
 float forward_network(Network *net) {
   // Encode input from scalar value to currents
-  if (net->type == BOTH) {
+  if (net->enc_type == BOTH) {
     encode_both(net->in_size, net->in_enc_size, net->in, net->in_enc);
-  } else if (net->type == PLACE) {
+  } else if (net->enc_type == PLACE) {
     encode_place(net->in_size, net->in_enc_size, net->in, net->in_enc,
                  net->centers);
+  } else if (net->enc_type == ERROR05) {
+    encode_error05(net->in_size, net->in_enc_size, net->in, net->in_enc);
   }
   // Call forward functions for children
   forward_connection(net->inhid, net->hid->x, net->in_enc);
@@ -224,8 +277,12 @@ float forward_network(Network *net) {
   forward_connection(net->hidout, net->out->x, net->hid->s);
   forward_neuron(net->out);
   // Decode output neuron traces to scalar value
-  float output =
-      decode_network(net->out_size, net->out->t, net->decoding_scale);
+  float output;
+  if (net->dec_type == SINGLE) {
+    output = decode_singletrace(net->out_size, net->out->t, net->decoding_scale);
+  } else if (net->dec_type == WEIGHTED) {
+    output = decode_weightedtrace(net->out_size, net->out->t, net->actions);
+  }
 
   return output;
 }

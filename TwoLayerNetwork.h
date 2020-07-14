@@ -6,13 +6,12 @@
 // Enumeration for network encoding types:
 // - div+divdot
 // - div place cells
-// - div+divdot, but div setpoint (0.5) subtracted
-typedef enum EncodingType { BOTH, PLACE, ERROR05 } EncodingType;
+// - div+divdot, but div setpoint subtracted
+typedef enum EncodingType { BOTH, ERROR } EncodingType;
 
 // Enumeration for network decoding types:
-// - action from scaled single trace
 // - actions weighted by trace
-typedef enum DecodingType { SINGLE, WEIGHTED } DecodingType;
+typedef enum DecodingType { WEIGHTED } DecodingType;
 
 // Struct that defines a network of two spiking layers
 typedef struct Network {
@@ -20,12 +19,10 @@ typedef struct Network {
   EncodingType enc_type;
   // Decoding type
   DecodingType dec_type;
-  // Decoding scale
-  float decoding_scale;
+  // D setpoint
+  float setpoint;
   // Decoding action vector
   float* actions;
-  // We need place cell centers if we have place cell encoding
-  float *centers;
   // Input, encoded input, hidden and output layer sizes
   int in_size, in_enc_size, hid_size, out_size;
   // Two input place holders: one for scalar values
@@ -48,12 +45,10 @@ typedef struct NetworkConf {
   EncodingType const enc_type;
   // Decoding type
   DecodingType const dec_type;
-  // Decoding scale
-  float decoding_scale;
+  // D setpoint
+  float setpoint;
   // Decoding action vector (just BS if we don't use them)
   float const *actions;
-  // Place cell centers (just BS if we don't use them)
-  float const *centers;
   // Input, encoded input, hidden and output layer sizes
   int const in_size, in_enc_size, hid_size, out_size;
   // Connection input -> hidden

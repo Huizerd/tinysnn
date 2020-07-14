@@ -1,4 +1,4 @@
-#include "Network.h"
+#include "TwoLayerNetwork.h"
 #include "functional.h"
 
 // Header file containing parameters
@@ -29,12 +29,10 @@ int main() {
   printf("\nHeader loading\n\n");
   // Encoding type
   printf("Encoding type: %d\n", net.enc_type);
-  printf("Place cell centers:\n");
-  print_array_1d(net.in_enc_size, net.centers);
   // Decoding type
   printf("Decoding type: %d\n", net.dec_type);
   // Decoding scale
-  printf("Decoding scale: %.4f\n\n", net.decoding_scale);
+  printf("D setpoint: %.4f\n\n", net.setpoint);
   // Decoding actions
   printf("Action vector:\n");
   print_array_1d(net.out_size, net.actions);

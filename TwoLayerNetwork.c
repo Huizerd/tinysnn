@@ -32,6 +32,7 @@ Network build_network(int const in_size, int const in_enc_size,
   // and underlying neurons and connections
   net.in = calloc(in_size, sizeof(*net.in));
   net.in_enc = calloc(in_enc_size, sizeof(*net.in_enc));
+  net.centers = calloc(in_enc_size, sizeof(*net.centers));
   net.actions = calloc(out_size, sizeof(*net.actions));
   // TODO: is this the best way to do this? Or let network struct consist of
   //  actual structs instead of pointers to structs?
@@ -57,6 +58,7 @@ void init_network(Network *net) {
   }
   for (int i = 0; i < net->in_enc_size; i++) {
     net->in_enc[i] = 0.0f;
+    net->centers[i] = 0.0f;
   }
   for (int i = 0; i < net->out_size; i++) {
     net->actions[i] = 0.0f;
@@ -93,6 +95,10 @@ void load_network_from_header(Network *net, NetworkConf const *conf) {
   net->dec_type = conf->dec_type;
   // Setpoint
   net->setpoint = conf->setpoint;
+  // Encoding place cell centers (just BS if we don't use them)
+  for (int i = 0; i < net->in_enc_size; i++) {
+    net->centers[i] = conf->centers[i];
+  }
   // Action vector (just BS if we don't use them)
   for (int i = 0; i < net->out_size; i++) {
     net->actions[i] = conf->actions[i];
@@ -120,6 +126,7 @@ void free_network(Network *net) {
   // connections
   free(net->in);
   free(net->in_enc);
+  free(net->centers);
   free(net->actions);
   free(net->inhid);
   free(net->hid);
@@ -132,6 +139,8 @@ void print_network(Network const *net) {
   // Encoding
   printf("Encoding type: %d\n", net->enc_type);
   printf("D setpoint: %.4f\n\n", net->setpoint);
+  printf("Place cell centers:\n");
+  print_array_1d(net->in_enc_size, net->centers);
 
   // Decoding
   printf("Decoding type: %d\n", net->dec_type);
@@ -181,7 +190,7 @@ static void encode_both(int const size, int const enc_size, float x[size],
 // Divergence setpoint D = 0.5
 // TODO: also load parameters for this?
 static void encode_error(int const size, int const enc_size, float x[size],
-                           float x_enc[enc_size], float setpoint) {
+                         float x_enc[enc_size], float setpoint) {
   // Subtract setpoint from D
   x[0] -= setpoint;
 
@@ -192,6 +201,40 @@ static void encode_error(int const size, int const enc_size, float x[size],
       x_enc[i] = fmaxf(0.0f, x[i % (size)]);
     } else {
       x_enc[i] = fabs(fminf(0.0f, x[i % (size)]));
+    }
+  }
+}
+
+// Encode divergence as spikes and subtract the divergence setpoint,
+// making use of "place cells" in a cubic distribution
+// Divergence setpoint D = 0.5
+// TODO: also load parameters for this?
+static void encode_cubic_place(int const size, int const enc_size, float x[size],
+                               float x_enc[enc_size], float centers[enc_size], float setpoint) {
+  // Subtract setpoint from D
+  x[0] -= setpoint;
+
+  // Reset all to 0
+  for (int i = 0; i < enc_size; i++) {
+    x_enc[i] = 0.0f;
+  }
+
+  // Determine in which bin D falls, then spike
+  for (int i = 0; i < enc_size; i++) {
+    // No lower bound
+    if (i == 0) {
+      if (x[0] <= centers[i])
+        x_enc[i] = 1.0f;
+    }
+    // No upper bound
+    else if (i == enc_size - 1){
+      if (x[0] > centers[i])
+        x_enc[i] = 1.0f;
+    }
+    // Both lower and upper bound
+    else {
+      if (x[0] > centers[i - 1] && x[0] <= centers[i])
+        x_enc[i] = 1.0f;
     }
   }
 }
@@ -226,6 +269,8 @@ float forward_network(Network *net) {
     encode_both(net->in_size, net->in_enc_size, net->in, net->in_enc);
   } else if (net->enc_type == ERROR) {
     encode_error(net->in_size, net->in_enc_size, net->in, net->in_enc, net->setpoint);
+  } else if (net->enc_type == CUBIC) {
+    encode_cubic_place(net->in_size, net->in_enc_size, net->in, net->in_enc, net->centers, net->setpoint);
   }
   // Call forward functions for children
   forward_connection(net->inhid, net->hid->x, net->in_enc);

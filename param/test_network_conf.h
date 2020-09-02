@@ -6,9 +6,10 @@
 #include "test_neuron_conf_hid.h"
 #include "test_neuron_conf_out.h"
 
-// Place cell centers as const array here, use pointer in configuration struct
+// Place cell centers and actions as const array here, use pointer in configuration struct
+float const centers[] = {-1.0f, 1.0f};
 float const actions[] = {0.0f, 1.0f, 2.0f};
 
-// enc_type, dec_type, setpoint, actions, centers, in_size, in_enc_size, hid_size, out_size,
+// enc_type, dec_type, setpoint, centers, actions, in_size, in_enc_size, hid_size, out_size,
 // inhid, hid, hidout, out
-NetworkConf const conf = {1, 0, 0.5f, actions, 1, 2, 4, 3, &conf_inhid, &conf_hid, &conf_hidout, &conf_out};
+NetworkConf const conf = {1, 0, 0.5f, centers, actions, 1, 2, 4, 3, &conf_inhid, &conf_hid, &conf_hidout, &conf_out};

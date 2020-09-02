@@ -31,8 +31,11 @@ int main() {
   printf("Encoding type: %d\n", net.enc_type);
   // Decoding type
   printf("Decoding type: %d\n", net.dec_type);
-  // Decoding scale
+  // D setpoint
   printf("D setpoint: %.4f\n\n", net.setpoint);
+  // Encoding place cell centers
+  printf("Place cell centers:\n");
+  print_array_1d(net.in_enc_size, net.centers);
   // Decoding actions
   printf("Action vector:\n");
   print_array_1d(net.out_size, net.actions);

@@ -5,9 +5,9 @@
 
 // Enumeration for network encoding types:
 // - div+divdot
-// - div place cells
 // - div+divdot, but div setpoint subtracted
-typedef enum EncodingType { BOTH, ERROR } EncodingType;
+// - div place cells, cubic placement, div setpoint subtracted
+typedef enum EncodingType { BOTH, ERROR, CUBIC } EncodingType;
 
 // Enumeration for network decoding types:
 // - actions weighted by trace
@@ -21,6 +21,8 @@ typedef struct Network {
   DecodingType dec_type;
   // D setpoint
   float setpoint;
+  // Encoding place cell centers
+  float* centers;
   // Decoding action vector
   float* actions;
   // Input, encoded input, hidden and output layer sizes
@@ -47,6 +49,8 @@ typedef struct NetworkConf {
   DecodingType const dec_type;
   // D setpoint
   float setpoint;
+  // Encoding place cell centers (just BS if we don't use them)
+  float const *centers;
   // Decoding action vector (just BS if we don't use them)
   float const *actions;
   // Input, encoded input, hidden and output layer sizes

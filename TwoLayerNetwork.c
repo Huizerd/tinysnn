@@ -223,18 +223,24 @@ static void encode_cubic_place(int const size, int const enc_size, float x[size]
   for (int i = 0; i < enc_size; i++) {
     // No lower bound
     if (i == 0) {
-      if (x[0] <= centers[i])
+      if (x[0] <= centers[i]) {
         x_enc[i] = 1.0f;
+        break;
+      }
     }
     // No upper bound
-    else if (i == enc_size - 1){
-      if (x[0] > centers[i])
+    else if (i == enc_size - 1) {
+      if (x[0] > centers[i]) {
         x_enc[i] = 1.0f;
+        break;
+      }
     }
     // Both lower and upper bound
     else {
-      if (x[0] > centers[i - 1] && x[0] <= centers[i])
+      if (x[0] > centers[i - 1] && x[0] <= centers[i]) {
         x_enc[i] = 1.0f;
+        break;
+      }
     }
   }
 }

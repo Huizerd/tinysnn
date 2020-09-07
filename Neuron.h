@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Enumeration for neuron types: regular LIF and adaptive LIF
 typedef enum NeuronType { RLIF, ALIF } NeuronType;
 
@@ -68,3 +72,7 @@ void print_neuron(Neuron const *n);
 
 // Forward
 void forward_neuron(Neuron *n);
+
+#ifdef __cplusplus
+}
+#endif

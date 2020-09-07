@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Connection.h"
 #include "Neuron.h"
 
@@ -88,3 +92,7 @@ void print_network(Network const *net);
 // Forward network and call forward functions for children
 // Encoding and decoding inside
 float forward_network(Network *net);
+
+#ifdef __cplusplus
+}
+#endif

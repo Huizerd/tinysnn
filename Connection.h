@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Struct that defines a connection between two layers of neurons
 typedef struct Connection {
   // Connection shape: (post, pre)
@@ -41,3 +45,7 @@ void free_connection(Connection *c);
 // Forward
 // Spikes as floats to deal with real-valued inputs
 void forward_connection(Connection *c, float x[], float const s[]);
+
+#ifdef __cplusplus
+}
+#endif

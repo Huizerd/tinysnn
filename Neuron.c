@@ -9,9 +9,6 @@ Neuron build_neuron(int const size) {
   // Neuron struct
   Neuron n;
 
-  // Set type
-  n.type = RLIF;
-
   // Set size
   n.size = size;
 
@@ -23,14 +20,11 @@ Neuron build_neuron(int const size) {
   n.s = calloc(size, sizeof(*n.s));
   n.t = calloc(size, sizeof(*n.t));
 
-  // Allocate memory for arrays: voltage, threshold, trace and reset constants
+  // Allocate memory for arrays: voltage, trace and reset constants
   // Addition constants
-  n.a_v = calloc(size, sizeof(*n.a_v));
-  n.a_th = calloc(size, sizeof(*n.a_th));
   n.a_t = calloc(size, sizeof(*n.a_t));
   // Decay constants
   n.d_v = calloc(size, sizeof(*n.d_v));
-  n.d_th = calloc(size, sizeof(*n.d_th));
   n.d_t = calloc(size, sizeof(*n.d_t));
   // Reset constants
   n.v_rest = 0.0f;
@@ -45,12 +39,9 @@ void init_neuron(Neuron *n) {
   // Loop over neurons
   for (int i = 0; i < n->size; i++) {
     // Addition constants
-    n->a_v[i] = 0.2f;
-    n->a_th[i] = 0.2f;
     n->a_t[i] = 1.0f;
     // Decay constants
     n->d_v[i] = 0.8f;
-    n->d_th[i] = 0.8f;
     n->d_t[i] = 0.8f;
     // Reset constants
     n->th_rest[i] = 0.2f;
@@ -95,18 +86,13 @@ void load_neuron_from_header(Neuron *n, NeuronConf const *conf) {
     printf("Neuron has a different shape than specified in the NeuronConf!\n");
     exit(1);
   }
-  // Neuron type
-  n->type = conf->type;
   // Loop over neurons
   // TODO: could also be done by just exchanging pointers to arrays?
   for (int i = 0; i < n->size; i++) {
-    // Constants for addition of voltage, threshold and trace
-    n->a_v[i] = conf->a_v[i];
-    n->a_th[i] = conf->a_th[i];
+    // Constants for addition of trace
     n->a_t[i] = conf->a_t[i];
-    // Constants for decay of voltage, threshold and trace
+    // Constants for decay of voltage and trace
     n->d_v[i] = conf->d_v[i];
-    n->d_th[i] = conf->d_th[i];
     n->d_t[i] = conf->d_t[i];
     // Constant for resetting threshold
     n->th_rest[i] = conf->th_rest[i];
@@ -119,11 +105,8 @@ void load_neuron_from_header(Neuron *n, NeuronConf const *conf) {
 void free_neuron(Neuron *n) {
   // calloc() was used for voltage/decay/reset constants, inputs, voltage,
   // threshold, spike and trace arrays
-  free(n->a_v);
-  free(n->a_th);
   free(n->a_t);
   free(n->d_v);
-  free(n->d_th);
   free(n->d_t);
   free(n->th_rest);
   free(n->x);
@@ -136,7 +119,6 @@ void free_neuron(Neuron *n) {
 // Print neuron parameters
 void print_neuron(Neuron const *n) {
   // Print all elements of neuron struct
-  printf("Neuron type: %d\n", n->type);
   printf("Input:\n");
   print_array_1d(n->size, n->x);
   printf("Voltage:\n");
@@ -148,12 +130,9 @@ void print_neuron(Neuron const *n) {
   printf("Trace:\n");
   print_array_1d(n->size, n->t);
   printf("Addition constants:\n");
-  print_array_1d(n->size, n->a_v);
-  print_array_1d(n->size, n->a_th);
   print_array_1d(n->size, n->a_t);
   printf("Decay constants:\n");
   print_array_1d(n->size, n->d_v);
-  print_array_1d(n->size, n->d_th);
   print_array_1d(n->size, n->d_t);
   printf("Reset constants threshold:\n");
   print_array_1d(n->size, n->th_rest);
@@ -203,17 +182,7 @@ static void update_voltage(Neuron *n) {
     // Decay difference with resting potential, then increase for incoming
     // spikes
     n->v[i] = (n->v[i] - n->v_rest) * n->d_v[i];
-    n->v[i] += n->a_v[i] * n->x[i];
-  }
-}
-
-// Update threshold
-static void update_threshold(Neuron *n) {
-  // Loop over neurons
-  for (int i = 0; i < n->size; i++) {
-    // First decay threshold, then increase for outgoing spikes
-    n->th[i] *= n->d_th[i];
-    n->th[i] += n->a_th[i] * n->s[i];
+    n->v[i] += n->x[i];
   }
 }
 
@@ -237,10 +206,6 @@ void forward_neuron(Neuron *n) {
   spiking(n);
   // Update trace
   update_trace(n);
-  // Update thresh (if adaptive)
-  if (n->type == ALIF) {
-    update_threshold(n);
-  }
   // Refraction
   refrac(n);
   // Reset inputs (otherwise we get accumulation over time)
